@@ -4,6 +4,7 @@ import data from "../utils/jp1k.json";
 // import JP1K from "../utils/jp1k";
 import { useEffect, useState } from "react";
 import { Furigana } from "gem-furigana";
+import { Switch } from "@headlessui/react";
 
 type Card = {
   order: number;
@@ -22,8 +23,9 @@ type Card = {
 const Home: NextPage = () => {
   const [orderNumber, setOrderNumber] = useState(0);
   const [currentCard, setCurrentCard] = useState<Card>(data[0] as Card);
-  // const [showWordDef, setShowWordDef] = useState(false);
-  // const [showSentenceDef, setShowSentenceDef] = useState(false);
+
+  // TODO: Save option in localstorage
+  const [showFurigana, setShowFurigana] = useState(false);
 
   // Handle chnage to previous card
   const handlePrevCard = () => {
@@ -46,6 +48,7 @@ const Home: NextPage = () => {
     };
   }, [orderNumber]);
 
+  // Handle Left & Right Arrow events
   useEffect(() => {
     const handleArrowKeys = (e: KeyboardEvent) => {
       if (e.code === "ArrowLeft") handlePrevCard();
@@ -86,44 +89,23 @@ const Home: NextPage = () => {
         <meta name="description" content="JP1K Practice Website" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-slate-800 p-4 text-white">
+      <main className="relative flex min-h-screen flex-col items-center justify-center bg-slate-800 p-4 text-white">
+        <div className="fixed top-3 right-3">
+          <FuriganaToggle
+            isChecked={showFurigana}
+            setChecked={() => setShowFurigana((prev) => !prev)}
+          />
+        </div>
         <p className="mb-2 font-semibold">Current Number: {orderNumber}</p>
         <div className="flex w-full max-w-lg flex-col">
-          <div className="flex min-h-[20rem] w-full flex-col space-y-4 rounded-lg bg-slate-900 p-6">
-            <div>
-              {/* <p className="text-2xl font-semibold text-teal-500">
-                {currentCard.word}
-              </p> */}
-              <div
-                className="text-2xl font-semibold text-teal-600"
-                dangerouslySetInnerHTML={{
-                  __html: new Furigana(currentCard.word_furigana).ReadingHtml,
-                }}
-              />
-              <p className="text-lg font-semibold">
-                {currentCard.word_definition}
-              </p>
-            </div>
-
-            <div className="h-[0.125rem] w-full rounded-xl bg-gray-600" />
-
-            <div>
-              {/* <p className="text-2xl font-semibold text-teal-500">
-                {currentCard.sentence}
-              </p> */}
-              <div
-                className="text-2xl font-semibold text-teal-600"
-                dangerouslySetInnerHTML={{
-                  __html: new Furigana(currentCard.sentence_furigana)
-                    .ReadingHtml,
-                }}
-              />
-              <p className="text-lg font-semibold">
-                {currentCard.sentence_definition}
-              </p>
-            </div>
-          </div>
-
+          {/* Key makes sure React treats any new data as a new component, even if the components rerenders in the same position. 
+            More info: https://beta.reactjs.org/learn/preserving-and-resetting-state#option-2-resetting-state-with-a-key
+          */}
+          <WordCard
+            showFurigana={showFurigana}
+            key={currentCard.order}
+            currentCard={currentCard}
+          />
           <div className="mt-4 flex w-full space-x-2">
             <button
               onClick={handlePrevCard}
@@ -144,6 +126,135 @@ const Home: NextPage = () => {
         </button> */}
       </main>
     </>
+  );
+};
+
+const WordCard = ({
+  currentCard,
+  showFurigana,
+}: {
+  currentCard: Card;
+  showFurigana: boolean;
+}) => {
+  const [showWordDef, setShowWordDef] = useState(false);
+  const [showSentenceDef, setShowSentenceDef] = useState(false);
+
+  return (
+    <div className="flex min-h-[20rem] w-full flex-col space-y-4 rounded-lg bg-slate-900 p-6">
+      <div className="flex min-h-[4.75rem] justify-between">
+        <div>
+          {showFurigana ? (
+            <div
+              className="text-2xl font-semibold text-teal-600"
+              dangerouslySetInnerHTML={{
+                __html: new Furigana(currentCard.word_furigana).ReadingHtml,
+              }}
+            />
+          ) : (
+            <p className="text-2xl font-semibold text-teal-600">
+              {currentCard.word}
+            </p>
+          )}
+          <p
+            className={`text-lg font-semibold ${
+              showWordDef ? "opacity-100" : "opacity-0"
+            } transition-opacity`}
+          >
+            {currentCard.word_definition}
+          </p>
+        </div>
+        <div>
+          <div className="h-10 w-10 rounded-full bg-indigo-500" />
+        </div>
+      </div>
+
+      <div
+        className={`h-[0.125rem] w-full rounded-xl bg-gray-600 ${
+          showWordDef ? "opacity-100" : "opacity-0"
+        }`}
+      />
+
+      <div
+        className={`${
+          showWordDef ? "opacity-100" : "opacity-0"
+        } transition-opacity`}
+      >
+        <div className="flex justify-between">
+          <div>
+            {showFurigana ? (
+              <div
+                className="text-2xl font-semibold text-teal-600"
+                dangerouslySetInnerHTML={{
+                  __html: new Furigana(currentCard.sentence_furigana)
+                    .ReadingHtml,
+                }}
+              />
+            ) : (
+              <p className="text-2xl font-semibold text-teal-600">
+                {currentCard.sentence}
+              </p>
+            )}
+            {showSentenceDef ? (
+              <p className="text-lg font-semibold">
+                {currentCard.sentence_definition}
+              </p>
+            ) : (
+              <small
+                onClick={() => setShowSentenceDef((prev) => !prev)}
+                className="cursor-pointer font-semibold underline"
+              >
+                Show definition
+              </small>
+            )}
+          </div>
+          <div>
+            <div className="h-10 w-10 rounded-full bg-indigo-500" />
+          </div>
+        </div>
+      </div>
+      {!showWordDef && (
+        <div className="flex grow flex-col justify-end">
+          {/* TODO: Add spacebar event to show answer */}
+          <button
+            onClick={() => setShowWordDef((prev) => !prev)}
+            className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold hover:bg-indigo-800/70"
+          >
+            Show Answer
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const FuriganaToggle = ({
+  isChecked,
+  setChecked,
+}: {
+  isChecked: boolean;
+  setChecked: () => void;
+}) => {
+  return (
+    <Switch.Group>
+      <div className="flex items-center">
+        <Switch.Label className="mr-2 text-sm font-semibold" passive>
+          Furigana
+        </Switch.Label>
+        <Switch
+          checked={isChecked}
+          onChange={setChecked}
+          className={`${
+            isChecked ? "bg-teal-600" : "bg-teal-900"
+          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+        >
+          <span
+            className={`${
+              isChecked ? "translate-x-6" : "translate-x-1"
+            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+          />
+        </Switch>
+      </div>
+    </Switch.Group>
   );
 };
 
