@@ -132,7 +132,7 @@ const WordCard = ({ currentCard }: { currentCard: Card }) => {
       {/* QUESTION WORD */}
       <div className="flex min-h-[4.75rem] justify-between space-x-8">
         <div>
-          {showFurigana ? (
+          {showFurigana || showWordDef ? (
             <div
               className="text-2xl font-semibold text-teal-600"
               dangerouslySetInnerHTML={{
