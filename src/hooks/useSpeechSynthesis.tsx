@@ -1,29 +1,42 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const useSpeechSynthesis = (props = {}) => {
-  const { onEnd = () => {} } = props;
+interface IProps {
+  onEnd?: () => void;
+}
+
+interface SpeakText {
+  voice?: SpeechSynthesisVoice;
+  text?: string;
+  rate?: number;
+  pitch?: number;
+  volume?: number;
+  lang?: string;
+}
+
+const defaultOnEnd = () => {
+  return;
+};
+
+const useSpeechSynthesis = (props: IProps = {}) => {
+  const onEnd = props?.onEnd || defaultOnEnd;
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [speaking, setSpeaking] = useState(false);
   const [supported, setSupported] = useState(false);
 
-  const processVoices = (voiceOptions: SpeechSynthesisVoice[]) => {
-    setVoices(voiceOptions);
-  };
-
-  const getVoices = () => {
+  const getVoices = useCallback(() => {
     // Firefox seems to have voices upfront and never calls the
     // voiceschanged event
     let voiceOptions = window.speechSynthesis.getVoices();
     if (voiceOptions.length > 0) {
-      processVoices(voiceOptions);
+      setVoices(voiceOptions);
       return;
     }
 
-    window.speechSynthesis.onvoiceschanged = (event) => {
-      voiceOptions = event.target.getVoices();
-      processVoices(voiceOptions);
+    window.speechSynthesis.onvoiceschanged = () => {
+      voiceOptions = window.speechSynthesis.getVoices();
+      setVoices(voiceOptions);
     };
-  };
+  }, []);
 
   const handleEnd = () => {
     setSpeaking(false);
@@ -35,9 +48,9 @@ const useSpeechSynthesis = (props = {}) => {
       setSupported(true);
       getVoices();
     }
-  }, []);
+  }, [getVoices]);
 
-  const speak = (args = {}) => {
+  const speak = (args: SpeakText) => {
     const {
       voice = null,
       text = "",
@@ -46,7 +59,9 @@ const useSpeechSynthesis = (props = {}) => {
       volume = 1,
       lang = "en",
     } = args;
+
     if (!supported) return;
+
     setSpeaking(true);
     // Firefox won't repeat an utterance that has been
     // spoken, so we need to create a new instance each time
@@ -58,6 +73,7 @@ const useSpeechSynthesis = (props = {}) => {
     utterance.pitch = pitch;
     utterance.volume = volume;
     utterance.lang = lang;
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
