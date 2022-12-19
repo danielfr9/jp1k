@@ -1,44 +1,31 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import data from "../utils/jp1k.json";
+import jp1k from "../utils/jp1k";
+import type { JP1K } from "../utils/jp1k";
 import { useEffect, useMemo, useState } from "react";
 import { Furigana } from "gem-furigana";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import { BsFillPlayFill } from "react-icons/bs";
 
-interface Card {
-  order: number;
-  word: string;
-  word_furigana: string;
-  word_definition: string;
-  sentence: string;
-  sentence_furigana: string;
-  sentence_definition: string;
-  has_kanji: boolean;
-  v1: boolean;
-  word_audio: string;
-  sentence_audio: string;
-}
-
 const Home: NextPage = () => {
   const [orderNumber, setOrderNumber] = useState(0);
-  const [currentCard, setCurrentCard] = useState<Card>(data[0] as Card);
+  const [currentCard, setCurrentCard] = useState<JP1K>(jp1k[0] as JP1K);
 
   // Handle chnage to previous card
   const handlePrevCard = () => {
-    setOrderNumber((prev) => (prev - 1 >= 0 ? prev - 1 : data.length - 1));
+    setOrderNumber((prev) => (prev - 1 >= 0 ? prev - 1 : jp1k.length - 1));
   };
 
   // Handle change to next card
   const handleNextCard = () => {
-    setOrderNumber((prev) => (prev + 1 < data.length ? prev + 1 : 0));
+    setOrderNumber((prev) => (prev + 1 < jp1k.length ? prev + 1 : 0));
   };
 
   // Change current card based on order number
   useEffect(() => {
     let ignore = false;
 
-    if (!ignore) setCurrentCard(data[orderNumber] as Card);
+    if (!ignore) setCurrentCard(jp1k[orderNumber] as JP1K);
 
     return () => {
       ignore = true;
@@ -94,7 +81,7 @@ const Home: NextPage = () => {
   );
 };
 
-const WordCard = ({ currentCard }: { currentCard: Card }) => {
+const WordCard = ({ currentCard }: { currentCard: JP1K }) => {
   const [showWordDef, setShowWordDef] = useState(false);
   const [showSentenceDef, setShowSentenceDef] = useState(false);
   const [showFurigana, setShowFurigana] = useState(false);
