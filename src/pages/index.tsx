@@ -1,13 +1,12 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import data from "../utils/jp1k.json";
-// import JP1K from "../utils/jp1k";
 import { useEffect, useMemo, useState } from "react";
 import { Furigana } from "gem-furigana";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import { BsFillPlayFill } from "react-icons/bs";
 
-type Card = {
+interface Card {
   order: number;
   word: string;
   word_furigana: string;
@@ -19,7 +18,7 @@ type Card = {
   v1: boolean;
   word_audio: string;
   sentence_audio: string;
-};
+}
 
 const Home: NextPage = () => {
   const [orderNumber, setOrderNumber] = useState(0);
@@ -61,25 +60,6 @@ const Home: NextPage = () => {
     };
   }, []);
 
-  // One time use function to parse Paparse array-of-arrays to JSON
-  // const ToJson = () => {
-  //   const jsonJP1K: Card[] = JP1K.map((card) => ({
-  //     order: Number(card[0] as string),
-  //     word: card[1] as string,
-  //     word_furigana: card[2] as string,
-  //     word_definition: card[3] as string,
-  //     sentence: card[4] as string,
-  //     sentence_furigana: card[5] as string,
-  //     sentence_definition: card[6] as string,
-  //     has_kanji: (card[7] as string) === "TRUE",
-  //     v1: (card[8] as string) === "TRUE",
-  //     word_audio: card[9] as string,
-  //     sentence_audio: card[10] as string,
-  //   }));
-
-  //   console.log(jsonJP1K);
-  // };
-
   return (
     <>
       <Head>
@@ -109,9 +89,6 @@ const Home: NextPage = () => {
             </button>
           </div>
         </div>
-        {/* <button className="bg-blue-500 hover:bg-blue-500" onClick={ToJson}>
-          Parse to JSON
-        </button> */}
       </main>
     </>
   );
@@ -126,6 +103,27 @@ const WordCard = ({ currentCard }: { currentCard: Card }) => {
   const cardFurigana = useMemo(() => {
     return new Furigana(currentCard.word_furigana);
   }, [currentCard]);
+
+  const handleSpeak = (text: string) => {
+    // Check for Haruka Voice; if not installed, return first Japanese voice found
+    const jpVoice =
+      voices.find(
+        (voice) => voice.name === "Microsoft Haruka - Japanese (Japan)"
+      ) || voices.find((voice) => voice.lang === "ja-JP");
+
+    // Stop execution if no japanese voice is installed
+    if (!jpVoice) {
+      console.log("Japanese voices not installed");
+      return;
+    }
+
+    speak({
+      text,
+      voice: jpVoice,
+      rate: 0.8,
+      lang: "ja",
+    });
+  };
 
   return (
     <div className="flex min-h-[23rem] w-full flex-col space-y-6 rounded-lg bg-slate-900 p-6">
@@ -159,15 +157,7 @@ const WordCard = ({ currentCard }: { currentCard: Card }) => {
           {showFurigana ||
           showWordDef ||
           cardFurigana.ReadingHtml === currentCard.word ? (
-            <button
-              onClick={() =>
-                speak({
-                  text: currentCard.word,
-                  voice: voices[8],
-                  lang: "ja",
-                })
-              }
-            >
+            <button onClick={() => handleSpeak(currentCard.word)}>
               <BsFillPlayFill className="h-10 w-10" />
             </button>
           ) : (
@@ -222,15 +212,7 @@ const WordCard = ({ currentCard }: { currentCard: Card }) => {
           </div>
           {/* SENTENCE AUDIO */}
           <div className="w-fit shrink-0">
-            <button
-              onClick={() =>
-                speak({
-                  text: currentCard.sentence,
-                  voice: voices[8],
-                  lang: "ja",
-                })
-              }
-            >
+            <button onClick={() => handleSpeak(currentCard.sentence)}>
               <BsFillPlayFill className="h-10 w-10" />
             </button>
           </div>
@@ -242,11 +224,7 @@ const WordCard = ({ currentCard }: { currentCard: Card }) => {
           <button
             onClick={() => {
               setShowWordDef((prev) => !prev);
-              speak({
-                text: currentCard.sentence,
-                voice: voices[8],
-                lang: "ja",
-              });
+              handleSpeak(currentCard.sentence);
             }}
             className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold transition-colors hover:bg-indigo-800/70"
           >
