@@ -9,9 +9,12 @@ import { BsFillPlayFill } from "react-icons/bs";
 
 const Home: NextPage = () => {
   const [orderNumber, setOrderNumber] = useState(0);
-  const [currentCard, setCurrentCard] = useState<JP1K>(jp1k[0] as JP1K);
 
-  // Handle chnage to previous card
+  const currentCard = useMemo(() => {
+    return jp1k[orderNumber];
+  }, [orderNumber]);
+
+  // Handle change to previous card
   const handlePrevCard = () => {
     setOrderNumber((prev) => (prev - 1 >= 0 ? prev - 1 : jp1k.length - 1));
   };
@@ -20,17 +23,6 @@ const Home: NextPage = () => {
   const handleNextCard = () => {
     setOrderNumber((prev) => (prev + 1 < jp1k.length ? prev + 1 : 0));
   };
-
-  // Change current card based on order number
-  useEffect(() => {
-    let ignore = false;
-
-    if (!ignore) setCurrentCard(jp1k[orderNumber] as JP1K);
-
-    return () => {
-      ignore = true;
-    };
-  }, [orderNumber]);
 
   // Handle Left & Right Arrow events
   useEffect(() => {
@@ -60,7 +52,89 @@ const Home: NextPage = () => {
           {/* Key makes sure React treats any new data as a new component, even if the components rerenders in the same position. 
             More info: https://beta.reactjs.org/learn/preserving-and-resetting-state#option-2-resetting-state-with-a-key
           */}
-          <WordCard key={currentCard.order} currentCard={currentCard} />
+          {currentCard ? (
+            <WordCard key={currentCard.order} currentCard={currentCard} />
+          ) : (
+            <div className="flex min-h-[23rem] w-full flex-col items-center justify-center space-y-6 rounded-lg bg-slate-900 p-6">
+              <svg
+                width="100"
+                height="100"
+                viewBox="0 0 45 45"
+                xmlns="http://www.w3.org/2000/svg"
+                stroke="#fff"
+              >
+                <g
+                  fill="none"
+                  fill-rule="evenodd"
+                  transform="translate(1 1)"
+                  stroke-width="2"
+                >
+                  <circle cx="22" cy="22" r="6" stroke-opacity="0">
+                    <animate
+                      attributeName="r"
+                      begin="1.5s"
+                      dur="3s"
+                      values="6;22"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-opacity"
+                      begin="1.5s"
+                      dur="3s"
+                      values="1;0"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-width"
+                      begin="1.5s"
+                      dur="3s"
+                      values="2;0"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                  <circle cx="22" cy="22" r="6" stroke-opacity="0">
+                    <animate
+                      attributeName="r"
+                      begin="3s"
+                      dur="3s"
+                      values="6;22"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-opacity"
+                      begin="3s"
+                      dur="3s"
+                      values="1;0"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-width"
+                      begin="3s"
+                      dur="3s"
+                      values="2;0"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                  <circle cx="22" cy="22" r="8">
+                    <animate
+                      attributeName="r"
+                      begin="0s"
+                      dur="1.5s"
+                      values="6;1;2;3;4;5;6"
+                      calcMode="linear"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+              </svg>
+            </div>
+          )}
           <div className="mt-4 flex w-full space-x-2">
             <button
               onClick={handlePrevCard}
