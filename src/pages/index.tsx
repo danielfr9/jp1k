@@ -46,18 +46,22 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative flex min-h-screen flex-col items-center justify-center bg-slate-800 p-4 text-white">
-        <p className="mb-2 font-semibold">Current Number: {orderNumber}</p>
-        <div className="flex w-full max-w-lg flex-col">
-          {/* Key makes sure React treats any new data as a new component, even if the components rerenders in the same position. 
+        <div className="flex w-full max-w-lg flex-col overflow-hidden">
+          <div className="overflow-hidden rounded-lg">
+            <div className="bg-[#0C1221] p-2">
+              <p className="text-center font-bold">JP1K #{orderNumber + 1}</p>
+            </div>
+            {/* Key makes sure React treats any new data as a new component, even if the components rerenders in the same position. 
             More info: https://beta.reactjs.org/learn/preserving-and-resetting-state#option-2-resetting-state-with-a-key
           */}
-          {currentCard ? (
-            <Card key={currentCard.order} currentCard={currentCard} />
-          ) : (
-            <div className="flex min-h-[23rem] w-full flex-col items-center justify-center space-y-6 rounded-lg bg-slate-900 p-6">
-              <LoadingCircle />
-            </div>
-          )}
+            {currentCard ? (
+              <Card key={currentCard.order} currentCard={currentCard} />
+            ) : (
+              <div className="flex min-h-[25rem] w-full flex-col items-center justify-center space-y-6 rounded-lg bg-slate-900 p-6">
+                <LoadingCircle />
+              </div>
+            )}
+          </div>
           <div className="mt-4 flex h-10 w-full space-x-2">
             <NavigationButton onClick={handlePrevCard}>Prev</NavigationButton>
             <NavigationButton onClick={handleNextCard}>Next</NavigationButton>
