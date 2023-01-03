@@ -38,10 +38,10 @@ const useSpeechSynthesis = (props: IProps = {}) => {
     };
   }, []);
 
-  const handleEnd = () => {
+  const handleEnd = useCallback(() => {
     setSpeaking(false);
     onEnd();
-  };
+  }, [onEnd]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -50,38 +50,41 @@ const useSpeechSynthesis = (props: IProps = {}) => {
     }
   }, [getVoices]);
 
-  const speak = (args: SpeakText) => {
-    const {
-      voice = null,
-      text = "",
-      rate = 1,
-      pitch = 1,
-      volume = 1,
-      lang = "en",
-    } = args;
+  const speak = useCallback(
+    (args: SpeakText) => {
+      const {
+        voice = null,
+        text = "",
+        rate = 1,
+        pitch = 1,
+        volume = 1,
+        lang = "en",
+      } = args;
 
-    if (!supported) return;
+      if (!supported) return;
 
-    setSpeaking(true);
-    // Firefox won't repeat an utterance that has been
-    // spoken, so we need to create a new instance each time
-    const utterance = new window.SpeechSynthesisUtterance();
-    utterance.text = text;
-    utterance.voice = voice;
-    utterance.onend = handleEnd;
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-    utterance.volume = volume;
-    utterance.lang = lang;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
+      setSpeaking(true);
+      // Firefox won't repeat an utterance that has been
+      // spoken, so we need to create a new instance each time
+      const utterance = new window.SpeechSynthesisUtterance();
+      utterance.text = text;
+      utterance.voice = voice;
+      utterance.onend = handleEnd;
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      utterance.volume = volume;
+      utterance.lang = lang;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    },
+    [handleEnd, supported]
+  );
 
-  const cancel = () => {
+  const cancel = useCallback(() => {
     if (!supported) return;
     setSpeaking(false);
     window.speechSynthesis.cancel();
-  };
+  }, [supported]);
 
   return {
     supported,
