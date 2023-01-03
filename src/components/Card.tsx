@@ -53,7 +53,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
   }, [cancelSpeak]);
 
   return (
-    <div className="flex min-h-[23rem] w-full flex-col space-y-6 rounded-lg bg-slate-900 p-6">
+    <div className="flex min-h-[24rem] w-full flex-col space-y-6 bg-slate-900 p-6">
       {/* QUESTION WORD */}
       <WordBox
         showWordDef={showWordDef}
