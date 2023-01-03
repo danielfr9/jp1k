@@ -1,11 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import jp1k from "../utils/jp1k";
-import type { JP1K } from "../utils/jp1k";
 import { useEffect, useMemo, useState } from "react";
-import { Furigana } from "gem-furigana";
-import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
-import { BsFillPlayFill } from "react-icons/bs";
+import Card from "../components/Card";
+import NavigationButton from "../components/NavigationButton";
+import LoadingCircle from "../components/LoadingCircle";
 
 const Home: NextPage = () => {
   const [orderNumber, setOrderNumber] = useState(0);
@@ -53,247 +52,19 @@ const Home: NextPage = () => {
             More info: https://beta.reactjs.org/learn/preserving-and-resetting-state#option-2-resetting-state-with-a-key
           */}
           {currentCard ? (
-            <WordCard key={currentCard.order} currentCard={currentCard} />
+            <Card key={currentCard.order} currentCard={currentCard} />
           ) : (
             <div className="flex min-h-[23rem] w-full flex-col items-center justify-center space-y-6 rounded-lg bg-slate-900 p-6">
-              <svg
-                width="100"
-                height="100"
-                viewBox="0 0 45 45"
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="#fff"
-              >
-                <g
-                  fill="none"
-                  fill-rule="evenodd"
-                  transform="translate(1 1)"
-                  stroke-width="2"
-                >
-                  <circle cx="22" cy="22" r="6" stroke-opacity="0">
-                    <animate
-                      attributeName="r"
-                      begin="1.5s"
-                      dur="3s"
-                      values="6;22"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="stroke-opacity"
-                      begin="1.5s"
-                      dur="3s"
-                      values="1;0"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="stroke-width"
-                      begin="1.5s"
-                      dur="3s"
-                      values="2;0"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                  <circle cx="22" cy="22" r="6" stroke-opacity="0">
-                    <animate
-                      attributeName="r"
-                      begin="3s"
-                      dur="3s"
-                      values="6;22"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="stroke-opacity"
-                      begin="3s"
-                      dur="3s"
-                      values="1;0"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="stroke-width"
-                      begin="3s"
-                      dur="3s"
-                      values="2;0"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                  <circle cx="22" cy="22" r="8">
-                    <animate
-                      attributeName="r"
-                      begin="0s"
-                      dur="1.5s"
-                      values="6;1;2;3;4;5;6"
-                      calcMode="linear"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                </g>
-              </svg>
+              <LoadingCircle />
             </div>
           )}
-          <div className="mt-4 flex w-full space-x-2">
-            <button
-              onClick={handlePrevCard}
-              className="w-full rounded-md bg-slate-900 p-1 px-2 font-semibold transition-colors hover:bg-slate-700"
-            >
-              Prev
-            </button>
-            <button
-              onClick={handleNextCard}
-              className="w-full rounded-md bg-slate-900 p-1 px-2 font-semibold transition-colors hover:bg-slate-700"
-            >
-              Next
-            </button>
+          <div className="mt-4 flex h-10 w-full space-x-2">
+            <NavigationButton onClick={handlePrevCard}>Prev</NavigationButton>
+            <NavigationButton onClick={handleNextCard}>Next</NavigationButton>
           </div>
         </div>
       </main>
     </>
-  );
-};
-
-const WordCard = ({ currentCard }: { currentCard: JP1K }) => {
-  const [showWordDef, setShowWordDef] = useState(false);
-  const [showSentenceDef, setShowSentenceDef] = useState(false);
-  const [showFurigana, setShowFurigana] = useState(false);
-  const { speak, voices } = useSpeechSynthesis();
-
-  const cardFurigana = useMemo(() => {
-    return new Furigana(currentCard.word_furigana);
-  }, [currentCard]);
-
-  const handleSpeak = (text: string) => {
-    // Check for Haruka Voice; if not installed, return first Japanese voice found
-    const jpVoice =
-      voices.find(
-        (voice) => voice.name === "Microsoft Haruka - Japanese (Japan)"
-      ) || voices.find((voice) => voice.lang === "ja-JP");
-
-    // Stop execution if no japanese voice is installed
-    if (!jpVoice) {
-      console.log("Japanese voices not installed");
-      return;
-    }
-
-    speak({
-      text,
-      voice: jpVoice,
-      rate: 0.8,
-      lang: "ja",
-    });
-  };
-
-  return (
-    <div className="flex min-h-[23rem] w-full flex-col space-y-6 rounded-lg bg-slate-900 p-6">
-      {/* QUESTION WORD */}
-      <div className="flex min-h-[4.75rem] justify-between space-x-8">
-        <div>
-          {showFurigana || showWordDef ? (
-            <div
-              className="text-2xl font-semibold text-teal-600"
-              dangerouslySetInnerHTML={{
-                __html: cardFurigana.ReadingHtml,
-              }}
-            />
-          ) : (
-            <p className="text-2xl font-semibold text-teal-600">
-              {currentCard.word}
-            </p>
-          )}
-          {/* WORD DEFINITION */}
-          <p
-            className={`text-lg font-semibold ${
-              showWordDef ? "opacity-100" : "opacity-0"
-            } transition-opacity`}
-          >
-            {currentCard.word_definition}
-          </p>
-        </div>
-
-        {/* WORD AUDIO */}
-        <div className="w-fit shrink-0">
-          {showFurigana ||
-          showWordDef ||
-          cardFurigana.ReadingHtml === currentCard.word ? (
-            <button onClick={() => handleSpeak(currentCard.word)}>
-              <BsFillPlayFill className="h-10 w-10" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowFurigana(true)}
-              className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold transition-colors hover:bg-indigo-800/70"
-            >
-              Show Reading
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* DIVIDER */}
-      <div
-        className={`h-[0.0625rem] w-full rounded-xl bg-gray-800 ${
-          showWordDef ? "opacity-100" : "opacity-0"
-        }`}
-      />
-
-      {/* EXAMPLE SENTENCE */}
-      <div
-        className={`${
-          showWordDef ? "opacity-100" : "opacity-0"
-        } transition-opacity`}
-      >
-        <div className="flex justify-between space-x-8">
-          <div>
-            <div
-              className="text-2xl font-semibold text-teal-600"
-              dangerouslySetInnerHTML={{
-                __html: new Furigana(currentCard.sentence_furigana).ReadingHtml,
-              }}
-            />
-
-            {/* <p className="text-2xl font-semibold text-teal-600">
-                {currentCard.sentence}
-              </p> */}
-
-            {showSentenceDef ? (
-              <small className="text-sm font-semibold">
-                {currentCard.sentence_definition}
-              </small>
-            ) : (
-              <small
-                onClick={() => setShowSentenceDef((prev) => !prev)}
-                className="cursor-pointer text-sm font-semibold underline"
-              >
-                Show definition
-              </small>
-            )}
-          </div>
-          {/* SENTENCE AUDIO */}
-          <div className="w-fit shrink-0">
-            <button onClick={() => handleSpeak(currentCard.sentence)}>
-              <BsFillPlayFill className="h-10 w-10" />
-            </button>
-          </div>
-        </div>
-      </div>
-      {!showWordDef && (
-        <div className="flex grow flex-col justify-end">
-          {/* TODO: Add spacebar event to show answer */}
-          <button
-            onClick={() => {
-              setShowWordDef((prev) => !prev);
-              handleSpeak(currentCard.sentence);
-            }}
-            className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold transition-colors hover:bg-indigo-800/70"
-          >
-            Show Answer
-          </button>
-        </div>
-      )}
-    </div>
   );
 };
 
