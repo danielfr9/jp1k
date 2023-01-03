@@ -46,7 +46,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative flex min-h-screen flex-col items-center justify-center bg-slate-800 p-4 text-white">
-        <div className="flex w-full max-w-lg flex-col overflow-hidden">
+        <div className="flex w-full max-w-lg flex-col">
           <div className="overflow-hidden rounded-lg">
             <div className="bg-[#0C1221] p-2">
               <p className="text-center font-bold">JP1K #{orderNumber + 1}</p>
@@ -62,7 +62,7 @@ const Home: NextPage = () => {
               </div>
             )}
           </div>
-          <div className="mt-4 flex h-10 w-full space-x-2">
+          <div className="mt-4 flex space-x-2">
             <NavigationButton onClick={handlePrevCard}>Prev</NavigationButton>
             <NavigationButton onClick={handleNextCard}>Next</NavigationButton>
           </div>
