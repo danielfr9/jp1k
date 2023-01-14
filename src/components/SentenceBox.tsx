@@ -18,7 +18,7 @@ const SentenceBox = ({
   return (
     <div
       className={`${
-        showWordDef ? "opacity-100" : "opacity-0"
+        showWordDef ? "opacity-100" : "select-none opacity-0"
       } transition-opacity`}
     >
       <div className="flex justify-between space-x-8">

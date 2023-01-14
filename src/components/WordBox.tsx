@@ -37,7 +37,7 @@ const WordBox = ({
         {/* WORD DEFINITION */}
         <p
           className={`text-lg font-semibold ${
-            showWordDef ? "opacity-100" : "opacity-0"
+            showWordDef ? "opacity-100" : "select-none opacity-0"
           } transition-opacity`}
         >
           {currentCard.word_definition}

@@ -53,7 +53,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
   }, [cancelSpeak]);
 
   return (
-    <div className="flex min-h-[24rem] w-full flex-col space-y-6 bg-slate-900 p-6">
+    <>
       {/* QUESTION WORD */}
       <WordBox
         showWordDef={showWordDef}
@@ -65,7 +65,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
       {/* DIVIDER */}
       <div
         className={`h-[0.0625rem] w-full rounded-xl bg-gray-800 ${
-          showWordDef ? "opacity-100" : "opacity-0"
+          showWordDef ? "opacity-100" : "select-none opacity-0"
         }`}
       />
 
@@ -90,7 +90,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
