@@ -33,7 +33,7 @@ const Home: NextPage = () => {
 
   // Handle select element change
   const handleSelectCard = (e: ChangeEvent<HTMLSelectElement>) => {
-    setOrderNumber(parseInt(e.target.value) || 0);
+    setOrderNumber(parseInt(e.currentTarget.value) || 0);
 
     // Remove focus to prevent conflict with keyboard events
     selectRef.current?.blur();
