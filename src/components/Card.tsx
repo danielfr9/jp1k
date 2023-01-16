@@ -1,17 +1,49 @@
-import { Furigana } from "../utils/gem-furigana";
-import { useEffect, useMemo, useState } from "react";
-import type { JP1K } from "../data/jp1k";
+import { Furigana } from "gem-furigana";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
+import type { JP1K } from "../utils/jp1k";
 import SentenceBox from "./SentenceBox";
 import WordBox from "./WordBox";
-import useSpeak from "../hooks/useVoices";
 
 const Card = ({ currentCard }: { currentCard: JP1K }) => {
   const [showWordDef, setShowWordDef] = useState(false);
-  const { cancel: cancelSpeak } = useSpeak();
+  const { speak, voices, cancel: cancelSpeak } = useSpeechSynthesis();
 
   const cardFurigana = useMemo(() => {
-    return Furigana(currentCard.word_furigana);
+    return new Furigana(currentCard.word_furigana);
   }, [currentCard]);
+
+  // Voice used for speechSynthesis
+  const JPVoice = useMemo(() => {
+    // Check for Haruka Voice; if not installed, return first Japanese voice found
+    const jpVoice =
+      voices.find(
+        (voice) => voice.name === "Microsoft Haruka - Japanese (Japan)"
+      ) || voices.find((voice) => voice.lang === "ja-JP");
+
+    // Return the JP voice
+    if (jpVoice) return jpVoice;
+
+    return null;
+  }, [voices]);
+
+  const handleSpeak = useCallback(
+    (text: string) => {
+      // Stop execution if no japanese voice is installed
+      if (!JPVoice) {
+        console.log("Japanese voices not installed");
+        return;
+      }
+
+      speak({
+        text,
+        voice: JPVoice,
+        rate: 0.8,
+        lang: "ja",
+      });
+    },
+    [speak, JPVoice]
+  );
 
   // Stop speech on unmount
   useEffect(() => {
@@ -27,6 +59,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
         showWordDef={showWordDef}
         cardFurigana={cardFurigana}
         currentCard={currentCard}
+        handleSpeak={handleSpeak}
       />
 
       {/* DIVIDER */}
@@ -37,7 +70,11 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
       />
 
       {/* EXAMPLE SENTENCE */}
-      <SentenceBox showWordDef={showWordDef} currentCard={currentCard} />
+      <SentenceBox
+        showWordDef={showWordDef}
+        currentCard={currentCard}
+        handleSpeak={handleSpeak}
+      />
 
       {!showWordDef && (
         <div className="flex grow flex-col justify-end">
@@ -45,6 +82,7 @@ const Card = ({ currentCard }: { currentCard: JP1K }) => {
           <button
             onClick={() => {
               setShowWordDef((prev) => !prev);
+              handleSpeak(currentCard.sentence);
             }}
             className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold transition-colors hover:bg-indigo-800/70"
           >

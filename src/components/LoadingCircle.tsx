@@ -1,12 +1,11 @@
-type IconUnit = "rem";
-type IconUnitValue = number;
+import React from "react";
 
 const LoadingCircle = ({
   width = 100,
   height = 100,
 }: {
-  height?: `${IconUnitValue}${IconUnit}` | number;
-  width?: `${IconUnitValue}${IconUnit}` | number;
+  width?: number;
+  height?: number;
 }) => {
   return (
     <svg

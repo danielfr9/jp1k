@@ -1,73 +1,57 @@
-import { Furigana } from "../utils/gem-furigana";
-import { useEffect, useRef, useState } from "react";
-import type { JP1K } from "../data/jp1k";
-import PlayIcon from "../icons/PlayIcon";
-import useSpeak from "../hooks/useVoices";
-import PauseIcon from "../icons/PauseIcon";
+import { Furigana } from "gem-furigana";
+import { useState } from "react";
+import { BsFillPlayFill } from "react-icons/bs";
+import type { JP1K } from "../utils/jp1k";
 
 interface ISentenceBoxProps {
   showWordDef: boolean;
   currentCard: JP1K;
+  handleSpeak: (text: string) => void;
 }
 
-const SentenceBox = ({ showWordDef, currentCard }: ISentenceBoxProps) => {
-  const { speakText, cancel, speaking } = useSpeak();
+const SentenceBox = ({
+  showWordDef,
+  currentCard,
+  handleSpeak,
+}: ISentenceBoxProps) => {
   const [showSentenceDef, setShowSentenceDef] = useState(false);
-  const isShown = useRef(false);
-
-  // Speak the sentence on show
-  useEffect(() => {
-    if (showWordDef && !isShown.current) {
-      speakText(currentCard.sentence);
-      isShown.current = true;
-    }
-  }, [showWordDef, speakText, currentCard.sentence]);
-
   return (
     <div
-      className={`flex justify-between space-x-8 ${
+      className={`${
         showWordDef ? "opacity-100" : "select-none opacity-0"
       } transition-opacity`}
     >
-      {/* SENTENCE TEXT */}
-      <div className="flex flex-col space-y-1">
-        <p
-          className="text-2xl font-semibold text-teal-600"
-          dangerouslySetInnerHTML={{
-            __html: Furigana(currentCard.sentence_furigana).ReadingHtml,
-          }}
-        />
-        {showSentenceDef ? (
-          <p className="font-semibold">{currentCard.sentence_definition}</p>
-        ) : (
-          <p
-            aria-label="Show sentence definition"
-            onClick={() => setShowSentenceDef((prev) => !prev)}
-            className="cursor-pointer select-none font-semibold underline"
-          >
-            Show definition
-          </p>
-        )}
-      </div>
-      {/* SENTENCE AUDIO */}
-      <div className="w-fit shrink-0">
-        {speaking ? (
+      <div className="flex justify-between space-x-8">
+        {/* SENTENCE TEXT */}
+        <div>
+          <div
+            className="text-2xl font-semibold text-teal-600"
+            dangerouslySetInnerHTML={{
+              __html: new Furigana(currentCard.sentence_furigana).ReadingHtml,
+            }}
+          />
+          {showSentenceDef ? (
+            <small className="text-sm font-semibold">
+              {currentCard.sentence_definition}
+            </small>
+          ) : (
+            <small
+              onClick={() => setShowSentenceDef((prev) => !prev)}
+              className="cursor-pointer select-none text-sm font-semibold underline"
+            >
+              Show definition
+            </small>
+          )}
+        </div>
+        {/* SENTENCE AUDIO */}
+        <div className="w-fit shrink-0">
           <button
-            aria-label="Pause sentence audio"
             disabled={!showWordDef}
-            onClick={() => cancel()}
+            onClick={() => handleSpeak(currentCard.sentence)}
           >
-            <PauseIcon />
+            <BsFillPlayFill className="h-10 w-10" />
           </button>
-        ) : (
-          <button
-            aria-label="Play sentence audio"
-            disabled={!showWordDef}
-            onClick={() => speakText(currentCard.sentence)}
-          >
-            <PlayIcon />
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );
