@@ -1,6 +1,5 @@
-import { type NextPage } from "next";
 import Head from "next/head";
-import jp1k from "../utils/jp1k";
+import jp1k from "../data/jp1k";
 import {
   type ChangeEvent,
   useEffect,
@@ -11,9 +10,9 @@ import {
 } from "react";
 import Card from "../components/Card";
 import NavigationButton from "../components/NavigationButton";
-import LoadingCircle from "../components/LoadingCircle";
+import LoadingCircle from "../icons/LoadingCircle";
 
-const Home: NextPage = () => {
+const Home = () => {
   const [orderNumber, setOrderNumber] = useState(0);
   const selectRef = useRef<HTMLSelectElement>(null);
 

@@ -1,29 +1,26 @@
-import type { Furigana } from "gem-furigana";
 import { useState } from "react";
-import { BsFillPlayFill } from "react-icons/bs";
-import type { JP1K } from "../utils/jp1k";
+import useSpeak from "../hooks/useVoices";
+import type { Furigana } from "../utils/gem-furigana";
+import type { JP1K } from "../data/jp1k";
+import PauseIcon from "../icons/PauseIcon";
+import PlayIcon from "../icons/PlayIcon";
 
 interface IWordBoxProps {
   showWordDef: boolean;
   cardFurigana: Furigana;
   currentCard: JP1K;
-  handleSpeak: (text: string) => void;
 }
 
-const WordBox = ({
-  showWordDef,
-  cardFurigana,
-  currentCard,
-  handleSpeak,
-}: IWordBoxProps) => {
+const WordBox = ({ showWordDef, cardFurigana, currentCard }: IWordBoxProps) => {
+  const { speakText, cancel, speaking } = useSpeak();
   const [showFurigana, setShowFurigana] = useState(false);
 
   return (
     <div className="flex min-h-[4.75rem] justify-between space-x-8">
+      {/* WORD TEXT */}
       <div>
-        {/* WORD TEXT */}
         {showFurigana || showWordDef ? (
-          <div
+          <p
             className="text-2xl font-semibold text-teal-600"
             dangerouslySetInnerHTML={{
               __html: cardFurigana.ReadingHtml,
@@ -49,11 +46,21 @@ const WordBox = ({
         {showFurigana ||
         showWordDef ||
         cardFurigana.ReadingHtml === currentCard.word ? (
-          <button onClick={() => handleSpeak(currentCard.word)}>
-            <BsFillPlayFill className="h-10 w-10" />
-          </button>
+          speaking ? (
+            <button aria-label="Pause word audio" onClick={() => cancel()}>
+              <PauseIcon />
+            </button>
+          ) : (
+            <button
+              aria-label="Play word audio"
+              onClick={() => speakText(currentCard.word)}
+            >
+              <PlayIcon />
+            </button>
+          )
         ) : (
           <button
+            aria-label="Show word reading"
             onClick={() => setShowFurigana(true)}
             className="rounded-md border border-indigo-800 bg-indigo-800/30 p-2 font-semibold transition-colors hover:bg-indigo-800/70"
           >
