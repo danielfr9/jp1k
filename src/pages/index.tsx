@@ -63,7 +63,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex min-h-screen flex-col bg-gradient-to-r from-[#0D324D] to-[#1F9864] text-white sm:items-center sm:justify-center sm:p-4">
         {/* Card container */}
-        <div className="flex w-full max-w-2xl grow flex-col overflow-hidden bg-gray-900 pb-6 md:rounded-lg">
+        <div className="flex min-h-[28rem] w-full max-w-2xl grow flex-col overflow-hidden bg-gray-900 pb-6 sm:grow-0 md:rounded-lg">
           {/* Select with current card number */}
           <div className="w-full bg-[#0C1221] p-2">
             <select
